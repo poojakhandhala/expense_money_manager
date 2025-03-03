@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   final List<Map<String, dynamic>> category = [
     {
       'icon': AssetsPath.borrow,
-      'name': "borrow_lent",
+      'name': "borrow_lent_detail",
       "page": () => BorrowDetailPage(),
     },
     {
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                 } else {
                   Get.snackbar(
                     "error".tr(),
-                    "incoreect_pin".tr(),
+                    "incorrect_pin".tr(),
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: AppColors.red,
                     colorText: AppColors.white,

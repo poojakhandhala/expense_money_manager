@@ -4,6 +4,7 @@ import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:expense_money_manager/utils/assets_path.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomerDetailPage extends StatefulWidget {
   final Map<String, dynamic> customer;
@@ -53,7 +54,9 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Get.back();
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     child: Icon(
@@ -328,6 +331,7 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
 
             dummyHistory.isNotEmpty
                 ? Expanded(
+                  // flex: 3,
                   child: ListView.builder(
                     physics: BouncingScrollPhysics(),
                     itemCount: dummyHistory.length,
@@ -358,42 +362,40 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
       elevation: 3,
       shape: RoundedRectangleBorder(),
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-      child: ListTile(
-        // leading: Icon(item["icon"], color: AppColors.primaryColor),
-        title: Text(
-          item["title"],
-          style: TextStyles().textStylePoppins(
-            size: 14,
-            color: AppColors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          item["subtitle"],
-          style: TextStyles().textStylePoppins(
-            size: 12,
-            color: AppColors.grey,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item["date"] ?? "Unknown Date",
+                  style: TextStyles().textStylePoppins(
+                    size: 14,
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  item["title"],
+                  style: TextStyles().textStylePoppins(
+                    size: 12,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
             Text(
               "\$${item["amount"]}",
               style: TextStyles().textStylePoppins(
-                size: 14,
+                size: 16,
                 color: item["amount"] < 0 ? AppColors.red : AppColors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              item["date"] ?? "Unknown Date",
-              style: TextStyles().textStylePoppins(
-                size: 12,
-                color: AppColors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -405,39 +407,11 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
 }
 
 List<Map<String, dynamic>> dummyHistory = [
-  {
-    "icon": Icons.shopping_cart,
-    "title": "Supermarkets",
-    "subtitle": "Grocery shopping",
-    "amount": -140,
-    "date": "2024-02-26",
-  },
-  {
-    "icon": Icons.health_and_safety,
-    "title": "Health and Beauty",
-    "subtitle": "Salon visit",
-    "amount": 322,
-    "date": "2024-02-25",
-  },
-  {
-    "icon": Icons.credit_card,
-    "title": "Transfers from card",
-    "subtitle": "Bank transfer",
-    "amount": 427,
-    "date": "2024-02-24",
-  },
-  {
-    "icon": Icons.restaurant,
-    "title": "Cafes and Restaurants",
-    "subtitle": "Lunch with friends",
-    "amount": 101,
-    "date": "2024-02-23",
-  },
-  {
-    "icon": Icons.more_horiz,
-    "title": "The rest",
-    "subtitle": "Miscellaneous",
-    "amount": 10,
-    "date": "2024-02-22",
-  },
+  {"title": "Supermarkets", "amount": -140, "date": "26-02-2025"},
+  {"title": "Health and Beauty", "amount": 322, "date": "26-10-2024"},
+  {"title": "Transfers from card", "amount": 427, "date": "6-09-2025"},
+  {"title": "Cafes and Restaurants", "amount": 101, "date": "16-01-2025"},
+  {"title": "The rest", "amount": 10, "date": "02-02-2023"},
+  {"title": "Supermarkets", "amount": -140, "date": "26-02-2025"},
+  {"title": "Health and Beauty", "amount": 322, "date": "26-10-2024"},
 ];

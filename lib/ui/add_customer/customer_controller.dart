@@ -9,6 +9,7 @@ class CustomerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     loadCustomers();
   }
 
@@ -21,7 +22,7 @@ class CustomerController extends GetxController {
     int balance = takenAmount - givenAmount;
     customers.add({
       "name": name,
-      "phone": phone,
+      "phone": phone.trim(),
       "givenAmount": givenAmount,
       "takenAmount": takenAmount,
       "balance": balance,
@@ -42,17 +43,55 @@ class CustomerController extends GetxController {
   }
 
   void saveCustomers() {
-    storage.write('customers', customers);
+    storage.write('customers_list', customers);
   }
 
   void loadCustomers() {
-    var storedCustomers = storage.read<List>('customers') ?? [];
-    if (storedCustomers != null) {
+    var storedCustomers = storage.read<List>('customers_list') ?? [];
+    if (storedCustomers.isNotEmpty) {
       customers.assignAll(
         storedCustomers.map((e) => Map<String, dynamic>.from(e)).toList(),
       );
     }
   }
+
+  //
+  // void saveCustomers() {
+  //   print("Saving Customers: ${customers.toList()}");
+  //   storage.write(
+  //     'customers',
+  //     customers.map((e) => Map<String, dynamic>.from(e)).toList(),
+  //   );
+  //   // storage.write('customers', customers);
+  //   // storage.write('customers', customers.map((e) => e).toList());
+  // }
+  //
+  // // void loadCustomers() {
+  // //   var storedCustomers = storage.read<List>('customers') ?? [];
+  // //   if (storedCustomers.isNotEmpty) {
+  // //     customers.assignAll(
+  // //       storedCustomers.map((e) => Map<String, dynamic>.from(e)).toList(),
+  // //     );
+  // //   }
+  // // }
+  // void loadCustomers() {
+  //   var storedCustomers = storage.read<List>('customers') ?? [];
+  //   print("Raw Stored Customers: $storedCustomers");
+  //   if (storedCustomers.isNotEmpty) {
+  //     customers.assignAll(
+  //       storedCustomers.map((e) {
+  //         print("Loading Customer: ${e['name']} - ${e['phone']}"); // Debugging
+  //         return {
+  //           "name": e["name"] ?? "", // Ensure name is loaded
+  //           "phone": e["phone"] ?? "", // Ensure phone is loaded
+  //           "givenAmount": e["givenAmount"] ?? 0,
+  //           "takenAmount": e["takenAmount"] ?? 0,
+  //           "balance": (e["takenAmount"] ?? 0) - (e["givenAmount"] ?? 0),
+  //         };
+  //       }).toList(),
+  //     );
+  //   }
+  // }
 
   void updateBalance(
     String phone,
@@ -62,18 +101,14 @@ class CustomerController extends GetxController {
     String description,
   ) {
     int index = customers.indexWhere((customer) => customer["phone"] == phone);
-
     if (index != -1) {
       var customer = customers[index];
-
       if (isGiven) {
         customer["givenAmount"] += amount;
       } else {
         customer["takenAmount"] += amount;
       }
-
       customer["balance"] = customer["givenAmount"] - customer["takenAmount"];
-
       customers[index] = customer; // Update the list
       saveCustomers();
       update(); // Notify UI

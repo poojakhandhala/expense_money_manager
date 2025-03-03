@@ -2,8 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/add_customer/add_customer.dart';
-import 'package:expense_money_manager/ui/add_customer/balance_page.dart';
-import 'package:expense_money_manager/ui/add_customer/customer_detail.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:expense_money_manager/utils/assets_path.dart';
@@ -146,55 +144,25 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                   itemBuilder: (context, index) {
                     var customer = customerController.customers[index];
                     String name = customer["name"] ?? "";
-                    String phone = customer["phone"] ?? "";
-                    int givenAmount = customer["givenAmount"] ?? 0;
-                    int takenAmount = customer["takenAmount"] ?? 0;
-                    int balance = givenAmount - takenAmount;
+                    String phone = customer["phone"] ?? "No Contact";
+                    // int givenAmount = customer["givenAmount"] ?? 0;
+                    // int takenAmount = customer["takenAmount"] ?? 0;
+                    // int balance = givenAmount - takenAmount;
                     // String initials =name.isNotEmpty? name.trim().split(' ').map((word) => word[0]).take(2).join().toUpperCase(): "";
 
-                    // return Dismissible(
-                    //   key: UniqueKey(),
-                    //   direction: DismissDirection.endToStart,
-                    //
-                    //   background: ColoredBox(
-                    //     color: AppColors.red,
-                    //     child: Align(
-                    //       alignment: Alignment.centerRight,
-                    //       child: Padding(
-                    //         padding: EdgeInsets.zero,
-                    //         child: Column(
-                    //           mainAxisAlignment: MainAxisAlignment.center,
-                    //           crossAxisAlignment: CrossAxisAlignment.center,
-                    //           children: [
-                    //             Icon(Icons.delete, color: Colors.white),
-                    //             Text(
-                    //               "Delete",
-                    //               style: TextStyles().textStylePoppins(
-                    //                 size: 16,
-                    //                 color: AppColors.white,
-                    //                 fontWeight: FontWeight.bold,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ),
-                    child:
                     return GestureDetector(
-                      onTap: () {
-                        customerController.selectCustomer(index);
-                        Get.to(
-                          () => CustomerDetailPage(customer: customer),
-                        )?.then((_) {
-                          customerController.selectedCustomerIndex.refresh();
-                        });
-                      },
-
+                      // onTap: () {
+                      //   customerController.selectCustomer(index);
+                      //   Get.to(
+                      //     () => CustomerDetailPage(customer: customer),
+                      //   )?.then((_) {
+                      //     customerController.selectedCustomerIndex.refresh();
+                      //   });
+                      // },
                       child: Card(
                         margin: EdgeInsets.symmetric(
                           horizontal: 15,
-                          vertical: 10,
+                          vertical: 5,
                         ),
                         shape: RoundedRectangleBorder(),
                         // decoration: BoxDecoration(
@@ -215,133 +183,138 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                             horizontal: 12,
                             vertical: 10,
                           ),
-                          child: Column(
+                          // child: Column(
+                          // mainAxisAlignment: MainAxisAlignment.start,
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          // children: [
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              // CircleAvatar(
+                              //   backgroundColor: AppColors.primaryColor,
+                              //   child: Text(
+                              //     initials,
+                              //     style: TextStyles().textStylePoppins(
+                              //       size: 14,
+                              //       color: AppColors.white,
+                              //       fontWeight: FontWeight.w500,
+                              //     ),
+                              //   ),
+                              // ),
+                              // SizedBox(width: 10),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // CircleAvatar(
-                                  //   backgroundColor: AppColors.primaryColor,
-                                  //   child: Text(
-                                  //     initials,
-                                  //     style: TextStyles().textStylePoppins(
-                                  //       size: 14,
-                                  //       color: AppColors.white,
-                                  //       fontWeight: FontWeight.w500,
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  // SizedBox(width: 10),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyles().textStylePoppins(
-                                          size: 16,
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "Contact No: $phone",
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: true,
-                                        style: TextStyles().textStylePoppins(
-                                          size: 14,
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ).tr(),
-                                      Text(
-                                        "Pending Balance: ₹$balance",
-                                        style: TextStyles().textStylePoppins(
-                                          size: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color:
-                                              balance < 0
-                                                  ? Colors.red
-                                                  : Colors.green,
-                                        ),
-                                      ).tr(),
-                                    ],
-                                  ),
-
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 5),
-                                    child: GestureDetector(
-                                      onTap: () => openWhatsApp(customer),
-                                      child: Image.asset(
-                                        AssetsPath.whatsapp,
-                                        height: 25,
-                                        width: 25,
-                                      ),
+                                  Text(
+                                    name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    style: TextStyles().textStylePoppins(
+                                      size: 16,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                  Text(
+                                    "Contact No: $phone",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    style: TextStyles().textStylePoppins(
+                                      size: 14,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ).tr(),
+                                  // Text(
+                                  //   "Pending Balance: ₹$balance",
+                                  //   style: TextStyles().textStylePoppins(
+                                  //     size: 14,
+                                  //     fontWeight: FontWeight.bold,
+                                  //     color:
+                                  //         balance < 0
+                                  //             ? Colors.red
+                                  //             : Colors.green,
+                                  //   ),
+                                  // ).tr(),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    height: 40,
-                                    width: 100,
-                                    child: CommonElevatedButton(
-                                      onPressed:
-                                          () => Get.to(
-                                            () => UpdateBalancePage(
-                                              customer: customer,
-                                              isGiven: true,
-                                            ),
-                                          ),
-                                      text: 'given'.tr(),
-                                      backgroundColor: AppColors.primaryColor,
-                                      progressColor: AppColors.white,
-                                      disabledBackgroundColor: AppColors.grey,
-                                    ),
+                              Spacer(),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: GestureDetector(
+                                  onTap: () => openWhatsApp(customer),
+                                  child: Image.asset(
+                                    AssetsPath.whatsapp,
+                                    height: 25,
+                                    width: 25,
                                   ),
-                                  SizedBox(width: 10),
-                                  SizedBox(
-                                    height: 40,
-                                    width: 100,
-                                    child: CommonElevatedButton(
-                                      onPressed:
-                                          () => Get.to(
-                                            () => UpdateBalancePage(
-                                              customer: customer,
-                                              isGiven: false,
-                                            ),
-                                          ),
-                                      text: 'taken'.tr(),
-                                      backgroundColor: AppColors.primaryColor,
-                                      progressColor: AppColors.white,
-                                      disabledBackgroundColor: AppColors.grey,
-                                    ),
-                                  ),
-                                  SizedBox(width: 70),
-                                  GestureDetector(
-                                    child: Icon(
-                                      Icons.delete,
-                                      color: AppColors.primaryColor,
-                                    ),
-                                    onTap: () => showDeleteDialog(index),
-                                  ),
-                                ],
+                                ),
+                              ),
+                              GestureDetector(
+                                child: Icon(
+                                  Icons.delete,
+                                  color: AppColors.primaryColor,
+                                ),
+                                onTap: () => showDeleteDialog(index),
                               ),
                             ],
                           ),
+                          // SizedBox(height: 10),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.start,
+                          //   crossAxisAlignment: CrossAxisAlignment.center,
+                          //   children: [
+                          //     SizedBox(
+                          //       height: 40,
+                          //       width: 100,
+                          //       child: CommonElevatedButton(
+                          //         onPressed:
+                          //             () => Get.to(
+                          //               () => UpdateBalancePage(
+                          //                 customer: customer,
+                          //                 isGiven: true,
+                          //               ),
+                          //             ),
+                          //         text: 'given'.tr(),
+                          //         backgroundColor: AppColors.primaryColor,
+                          //         progressColor: AppColors.white,
+                          //         disabledBackgroundColor: AppColors.grey,
+                          //       ),
+                          //     ),
+                          //     SizedBox(width: 10),
+                          //     SizedBox(
+                          //       height: 40,
+                          //       width: 100,
+                          //       child: CommonElevatedButton(
+                          //         onPressed:
+                          //             () => Get.to(
+                          //               () => UpdateBalancePage(
+                          //                 customer: customer,
+                          //                 isGiven: false,
+                          //               ),
+                          //             ),
+                          //         text: 'taken'.tr(),
+                          //         backgroundColor: AppColors.primaryColor,
+                          //         progressColor: AppColors.white,
+                          //         disabledBackgroundColor: AppColors.grey,
+                          //       ),
+                          //     ),
+                          //     SizedBox(width: 70),
+                          //     GestureDetector(
+                          //       child: Icon(
+                          //         Icons.delete,
+                          //         color: AppColors.primaryColor,
+                          //       ),
+                          //       onTap: () => showDeleteDialog(index),
+                          //     ),
+                          //   ],
+                          // ),
+                          //   ],
+                          // ),
                         ),
                       ),
                       // ),

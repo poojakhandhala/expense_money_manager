@@ -3,7 +3,8 @@ import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_edit_text_field.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/add_customer/customer_controller.dart';
-import 'package:expense_money_manager/ui/borrow/borrow_controller.dart';
+import 'package:expense_money_manager/ui/borrow/borrow_controller2.dart';
+import 'package:expense_money_manager/ui/discount/discount_controller.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 
 class BorrowAddForm extends StatefulWidget {
+  final bool isDiscount;
+  const BorrowAddForm({Key? key, this.isDiscount = false}) : super(key: key);
   @override
   State<BorrowAddForm> createState() => _BorrowAddFormState();
 }
@@ -21,19 +24,38 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _vyajDateController = TextEditingController();
+  final TextEditingController _discountController = TextEditingController();
+
   String? _selectedCustomerName;
   String _transactionType = "Given";
   String _amountHint = "Enter Given Amount";
-  final BorrowController borrowController = Get.find<BorrowController>();
-  final CustomerController customerController = Get.find<CustomerController>();
+  // final BorrowController borrowController = Get.put(
+  //   BorrowController(),
+  //   permanent: true,
+  // );
 
+  final BorrowController2 borrowController2 = Get.find();
+  final DiscountController discountController = Get.put(
+    DiscountController(),
+    permanent: true,
+  );
+
+  final CustomerController customerController = Get.put(
+    CustomerController(),
+    permanent: true,
+  );
   @override
   void initState() {
     super.initState();
     _dateController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    _vyajDateController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -42,7 +64,7 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
     );
     if (pickedDate != null) {
       setState(() {
-        _dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+        controller.text = DateFormat('dd/MM/yyyy').format(pickedDate);
       });
     }
   }
@@ -55,52 +77,115 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
     });
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_selectedCustomerName == null ||
-        _descriptionController.text.isEmpty ||
-        _amountController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("fill_fields").tr(),
-          backgroundColor: AppColors.red,
-        ),
+        _selectedCustomerName!.trim().isEmpty ||
+        _descriptionController.text.trim().isEmpty ||
+        _amountController.text.trim().isEmpty ||
+        _dateController.text.trim().isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please fill in all required fields!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
       return;
     }
 
-    double? amount = double.tryParse(_amountController.text);
+    int? amount = int.tryParse(_amountController.text.replaceAll(",", ""));
     if (amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("enter_amount").tr(),
-          backgroundColor: Colors.red,
-        ),
+      Get.snackbar(
+        "Invalid Amount",
+        "Enter a valid amount",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
       return;
     }
 
-    borrowController.addTransaction({
-      "date": _dateController.text,
-      "customer": _selectedCustomerName,
-      "description": _descriptionController.text,
-      "transactionType": _transactionType,
-      "amount": amount.toStringAsFixed(2),
-    });
+    Get.dialog(
+      Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("transaction_add").tr(),
-        backgroundColor: Colors.green,
-      ),
+    await Future.delayed(Duration(seconds: 1));
+
+    String transactionType = _transactionType ?? "Given";
+
+    // int index = borrowController2.borrow.indexWhere(
+    //   (customer) => customer["name"] == _selectedCustomerName,
+    // );
+    //
+    // if (index != -1) {
+    //   borrowController2.updateborrowBalance(
+    //     _selectedCustomerName!,
+    //     _transactionType == "Given",
+    //     amount,
+    //     _descriptionController.text.trim(),
+    //   );
+    // } else {
+    //   // Add new customer
+    //   borrowController2.addborrowCustomer(
+    //     _selectedCustomerName!.trim(),
+    //     givenAmount: _transactionType == "Given" ? amount : 0,
+    //     takenAmount: _transactionType == "Given" ? 0 : amount,
+    //   );
+    // }
+
+    // Get.back();
+    if (widget.isDiscount) {
+      // Handle Discount Transactions
+      int? discountPercentage =
+          int.tryParse(_discountController.text.trim()) ?? 0;
+      discountController.addDiscountCustomer(
+        _selectedCustomerName!.trim(),
+        givenAmount: transactionType == "Given" ? amount : 0,
+        takenAmount: transactionType == "Taken" ? amount : 0,
+        date: _dateController.text.trim(),
+        description: _descriptionController.text.trim(),
+        vyajDate: _vyajDateController.text.trim(),
+        discountPercentage: discountPercentage,
+      );
+    } else {
+      // Handle Borrow Transactions
+      borrowController2.addborrowCustomer(
+        _selectedCustomerName!.trim(),
+        givenAmount: transactionType == "Given" ? amount : 0,
+        takenAmount: transactionType == "Taken" ? amount : 0,
+      );
+    }
+
+    Get.back();
+    // working
+    // borrowController2.addborrowCustomer(
+    //   // _dateController.text.trim(),
+    //   _selectedCustomerName!.trim(),
+    //   // _descriptionController.text.trim(),
+    //   givenAmount: transactionType == "Given" ? amount : 0,
+    //   takenAmount: transactionType == "Taken" ? amount : 0,
+    //   // transactionType,
+    //   // amount,
+    // );
+    //
+    // Get.back();
+
+    Get.snackbar(
+      "Success",
+      "Transaction added successfully!",
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
     );
 
     _descriptionController.clear();
     _amountController.clear();
+    _discountController.clear();
     _transactionType = "Given";
-    _amountHint = "enter_given_amount";
+    _amountHint = "Enter Given Amount";
     _selectedCustomerName = null;
     _nameController.clear();
 
+    borrowController2.update();
+    discountController.update();
     setState(() {});
     Get.back();
   }
@@ -109,7 +194,12 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: CommonAppBar(title: 'borrow_lent'),
+      appBar: CommonAppBar(
+        title:
+            widget.isDiscount
+                ? 'given_interest_add'.tr()
+                : 'borrow_lent_add'.tr(),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -122,14 +212,14 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
                 textEditingController: _dateController,
                 readOnly: true,
                 suffixIcon: GestureDetector(
-                  onTap: () => _selectDate(context),
+                  onTap: () => _selectDate(context, _dateController),
                   child: Icon(
                     Icons.date_range,
                     color: AppColors.black,
                     size: 24,
                   ),
                 ),
-                onTap: () => _selectDate(context),
+                onTap: () => _selectDate(context, _dateController),
               ),
               SizedBox(height: 10),
 
@@ -208,8 +298,34 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
                 textEditingController: _amountController,
                 textInputType: TextInputType.number,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
 
+              if (widget.isDiscount)
+                Column(
+                  children: [
+                    CommonEditTextField(
+                      hintText: "enter_discount_percentage".tr(),
+                      textEditingController: _discountController,
+                      textInputType: TextInputType.number,
+                    ),
+                    SizedBox(height: 10),
+
+                    CommonEditTextField(
+                      hintText: "select_expense_date".tr(),
+                      textEditingController: _vyajDateController,
+                      readOnly: true,
+                      suffixIcon: GestureDetector(
+                        onTap: () => _selectDate(context, _vyajDateController),
+                        child: Icon(
+                          Icons.date_range,
+                          color: AppColors.black,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              SizedBox(height: 20),
               CommonElevatedButton(
                 onPressed: _submitForm,
                 text: 'submit'.tr(),

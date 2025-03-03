@@ -3,8 +3,10 @@
   "income": "Income",
   "outgoing": "Outgoing",
   "outcome": "Outcome",
-  "borrow_lent": "Borrowed / Lent Details",
+  "borrow_lent_add": "Borrowed / Lent Add",
+  "borrow_lent_detail": "Borrowed / Lent Details",
   "given_interest":"Given With Interest",
+  "given_interest_add":"Given With Interest Add",
   "add_customer":"Add Customers",
   "add_contact" :"Add Contact",
   "unlock_pin": "Enter PIN to Unlock",
@@ -20,7 +22,8 @@
   "fill_fields":"Please fill in all fields",
   "transaction_add":"Transaction Added Successfully",
   "no_given_data":"No Given With Interest Available",
-
+  "enter_discount_percentage": "Enter Discount Percentage",
+  "discount_percentage": "Discount Percentage",
 
 
 
@@ -55,6 +58,7 @@
   "enter_amount":"Please enter an amount",
   "selected_date":"Please select a date",
   "amount_digit":"Amount must be greater than 0",
+  "select_expense_date": "Select Expense Date",
   "total_in":"Total In",
   "total_out":  "Total Out",
   "history": "History",

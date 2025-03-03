@@ -3,8 +3,10 @@
   "income": "આવક",
   "outgoing": "જાવક",
   "outcome": "જાવક",
-  "borrow_lent": "ઉછીના આપેલ/લીધેલ",
+  "borrow_lent_add": "ઉછીના આપેલ/લીધેલ ઉમેરો",
+  "borrow_lent_detail": "ઉછીના આપેલ/લીધેલ",
   "given_interest":"વ્યાજ આપેલ/લીધેલ",
+  "given_interest_add":"વ્યાજ આપેલ/લીધેલ ઉમેરો",
   "add_customer":"ગ્રાહકો ઉમેરો",
   "add_contact": "ગ્રાહકો ઉમેરો",
   "unlock_pin": "અનલૉક કરવા માટે પિન દાખલ કરો",
@@ -20,7 +22,7 @@
   "fill_fields":"કૃપા કરીને તમામ ફીલ્ડ ભરો",
   "transaction_add":"વ્યવહાર સફળતાપૂર્વક ઉમેરાયો",
   "no_given_data": "વ્યાજ સાથે આપવામાં આવતું નથી",
-
+  "discount_percentage": "ડિસ્કાઉન્ટ ટકાવારી",
 
 
 
@@ -54,6 +56,7 @@
   "enter_amount":"કૃપા કરીને રકમ દાખલ કરો",
   "selected_date":"કૃપા કરીને તારીખ પસંદ કરો",
   "amount_digit":"રકમ 0 કરતા વધારે હોવી જોઈએ",
+  "select_expense_date": "ખર્ચની તારીખ પસંદ કરો",
   "total_in":"કુલ આવક",
   "total_out":  "કુલ જાવક",
   "history": "ઈતિહાસ",
