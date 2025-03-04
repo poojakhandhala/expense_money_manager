@@ -3,6 +3,7 @@ import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_edit_text_field.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/borrow/borrow_controller2.dart';
+import 'package:expense_money_manager/ui/discount/discount_controller.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,8 @@ class _UpdateBalancePageState extends State<UpdateBalancePage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final BorrowController2 borrowController2 = Get.find<BorrowController2>();
+  final DiscountController discountController = Get.find<DiscountController>();
+
   DateTime? _selectedDate;
   @override
   void initState() {
@@ -73,70 +76,96 @@ class _UpdateBalancePageState extends State<UpdateBalancePage> {
       );
       return;
     }
+    String customerName = widget.customer["name"];
+    bool isGiven = widget.isGiven;
+    String description = _descriptionController.text.trim();
+    int discountPercentage = discountController.getDiscountPercentage(
+      customerName,
+      amount,
+    );
+
+    // Update Borrow Balance
+    borrowController2.updateborrowBalance(
+      customerName,
+      isGiven,
+      amount,
+      description,
+    );
+
+    // Update Discount Balance
+    discountController.updateDiscountBalance(
+      customerName,
+      isGiven,
+      amount,
+      description,
+      discountPercentage,
+    );
 
     // borrowController2.updateborrowBalance(
     //   widget.customer["name"],
     //   widget.isGiven,
     //   amount,
-    //   _selectedDate!,
     //   _descriptionController.text.trim(),
-    borrowController2.updateborrowBalance(
-      widget.customer["name"],
-      widget.isGiven,
-      amount,
-      _descriptionController.text.trim(),
+    //
+    //   // widget.isGiven,
+    //   // amount,
+    //   // _descriptionController.text.trim().isNotEmpty
+    //   //     ? _descriptionController.text.trim()
+    //   //     : "",
+    // );
+    //
+    Get.back();
+  }
 
-      // widget.isGiven,
-      // amount,
-      // _descriptionController.text.trim().isNotEmpty
-      //     ? _descriptionController.text.trim()
-      //     : "",
+  void _saveTransaction1() {
+    if (_amountController.text.trim().isEmpty) {
+      Get.snackbar(
+        "error".tr(),
+        "enter_amount".tr(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    int amount = int.tryParse(_amountController.text.trim()) ?? 0;
+    if (amount <= 0) {
+      Get.snackbar(
+        "error".tr(),
+        "amount_digit".tr(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    String customerName = widget.customer["name"];
+    bool isGiven = widget.isGiven;
+    String description = _descriptionController.text.trim();
+
+    int discountPercentage = discountController.getDiscountPercentage(
+      customerName,
+      amount,
+    );
+
+    // Update Borrow Balance
+    borrowController2.updateborrowBalance(
+      customerName,
+      isGiven,
+      amount,
+      description,
+    );
+
+    discountController.updateDiscountBalance(
+      customerName,
+      isGiven,
+      amount,
+      description,
+      discountPercentage,
     );
 
     Get.back();
   }
-
-  // void _saveTransaction() {
-  //   if (_amountController.text.trim().isEmpty) {
-  //     Get.snackbar(
-  //       "error".tr(),
-  //       "enter_amount".tr(),
-  //       backgroundColor: Colors.red,
-  //       colorText: Colors.white,
-  //     );
-  //     return;
-  //   }
-  //
-  //   // if (_selectedDate == null) {
-  //   //   Get.snackbar(
-  //   //     "error".tr(),
-  //   //     "selected_date".tr(),
-  //   //     backgroundColor: Colors.red,
-  //   //     colorText: Colors.white,
-  //   //   );
-  //   //   return;
-  //   // }
-  //
-  //   int amount = int.tryParse(_amountController.text.trim()) ?? 0;
-  //   if (amount <= 0) {
-  //     Get.snackbar(
-  //       "error".tr(),
-  //       "amount_digit".tr(),
-  //       backgroundColor: Colors.red,
-  //       colorText: Colors.white,
-  //     );
-  //     return;
-  //   }
-  //
-  //   customerController.updateBalance(
-  //     widget.customer["phone"],
-  //     widget.isGiven,
-  //     amount,
-  //     _descriptionController.text.trim(),
-  //   );
-  //
-  //   Get.back();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +239,7 @@ class _UpdateBalancePageState extends State<UpdateBalancePage> {
               SizedBox(height: 20),
 
               CommonElevatedButton(
-                onPressed: _saveTransaction,
+                onPressed: _saveTransaction1,
                 text: 'submit'.tr(),
                 progressColor: AppColors.white,
                 backgroundColor: AppColors.primaryColor,

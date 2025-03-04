@@ -73,7 +73,7 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
                 if (_nameController.text.trim().isEmpty) {
                   Get.snackbar(
                     "error".tr(),
-                    "name_requird".tr(),
+                    "name_required".tr(),
                     backgroundColor: Colors.red,
                     colorText: Colors.white,
                   );

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/transction_card.dart';
 import 'package:expense_money_manager/ui/add_customer/customer_controller.dart';
+import 'package:expense_money_manager/ui/add_customer/customer_detail.dart';
 import 'package:expense_money_manager/ui/borrow/borrow_addform.dart';
 import 'package:expense_money_manager/ui/borrow/borrow_controller2.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
@@ -63,9 +64,23 @@ class _BorrowDetailPageState extends State<BorrowDetailPage> {
                   itemCount: borrowController.borrow.length,
                   itemBuilder: (context, index) {
                     final transaction = borrowController.borrow[index];
-                    return TransactionCard(
-                      transaction: transaction,
-                      index: index,
+                    return GestureDetector(
+                      onTap: () {
+                        borrowController.selectborrowCustomer(index);
+                        var selectedCustomer = borrowController.borrow[index];
+                        Get.to(
+                          () => CustomerDetailPage(
+                            customer: selectedCustomer,
+                            isDiscountPage: false,
+                          ),
+                        )?.then((_) {
+                          customerController.selectedCustomerIndex.refresh();
+                        });
+                      },
+                      child: TransactionCard(
+                        transaction: transaction,
+                        index: index,
+                      ),
                     );
                   },
                 ),

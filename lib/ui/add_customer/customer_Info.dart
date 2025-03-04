@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:expense_money_manager/controller/customer_api_controller.dart';
 import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/add_customer/add_customer.dart';
@@ -25,100 +26,9 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
     CustomerController(),
     permanent: true,
   );
-
-  // // Function to show the popup
-  // void _showAddCustomerDialog() {
-  //   Get.dialog(
-  //     AlertDialog(
-  //       title: Text(
-  //         "Add Customer",
-  //         style: TextStyles().textStylePoppins(
-  //           size: 16,
-  //           color: AppColors.black,
-  //           fontWeight: FontWeight.bold,
-  //         ),
-  //       ),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           CommonEditTextField(
-  //             hintText: "Name",
-  //             textEditingController: _nameController,
-  //           ),
-  //           SizedBox(height: 10),
-  //           CommonEditTextField(
-  //             textEditingController: _phoneController,
-  //             textInputType: TextInputType.phone,
-  //             hintText: "Phone",
-  //             isPhoneField: true,
-  //             maxLength: 10,
-  //           ),
-  //           SizedBox(height: 20),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             children: [
-  //               Expanded(
-  //                 child: CommonElevatedButton(
-  //                   onPressed: () => Get.back(),
-  //                   text: 'Cancel',
-  //                   progressColor: AppColors.white,
-  //                   backgroundColor: AppColors.primaryColor,
-  //                   disabledBackgroundColor: AppColors.grey,
-  //                 ),
-  //               ),
-  //               SizedBox(width: 10),
-  //               Expanded(
-  //                 child: CommonElevatedButton(
-  //                   onPressed: () {
-  //                     if (_nameController.text.trim().isEmpty) {
-  //                       Get.snackbar(
-  //                         "Error",
-  //                         "Name is required",
-  //                         backgroundColor: Colors.red,
-  //                         colorText: Colors.white,
-  //                       );
-  //                       return;
-  //                     }
-  //                     if (_phoneController.text.trim().length != 10 ||
-  //                         !RegExp(
-  //                           r'^[0-9]+$',
-  //                         ).hasMatch(_phoneController.text.trim())) {
-  //                       Get.snackbar(
-  //                         "Error",
-  //                         "Enter a valid 10-digit phone number",
-  //                         backgroundColor: Colors.red,
-  //                         colorText: Colors.white,
-  //                       );
-  //                       return;
-  //                     }
-  //
-  //                     customerController.addCustomer(
-  //                       _nameController.text,
-  //                       _phoneController.text,
-  //                       givenAmount: 0,
-  //                       takenAmount: 0,
-  //                     );
-  //
-  //                     // Clear inputs
-  //                     _nameController.clear();
-  //                     _phoneController.clear();
-  //
-  //                     Get.back();
-  //                   },
-  //                   text: 'Save',
-  //                   progressColor: AppColors.white,
-  //                   backgroundColor: AppColors.primaryColor,
-  //                   disabledBackgroundColor: AppColors.grey,
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
+  final CustomerApiController customerApiController = Get.put(
+    CustomerApiController(),
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +37,7 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
       appBar: CommonAppBar(title: "customer_Info"),
       body: Obx(
         () =>
-            customerController.customers.isEmpty
+            customerApiController.customers.isEmpty
                 ? Center(
                   child:
                       Text(
@@ -140,185 +50,133 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                       ).tr(),
                 )
                 : ListView.builder(
-                  itemCount: customerController.customers.length,
+                  itemCount: customerApiController.customers.length,
                   itemBuilder: (context, index) {
-                    var customer = customerController.customers[index];
-                    String name = customer["name"] ?? "";
-                    String phone = customer["phone"] ?? "No Contact";
+                    var customer = customerApiController.customers[index];
+                    // String name = customer["name"] ?? "";
+                    // String phone = customer["phone"] ?? "No Contact";
                     // int givenAmount = customer["givenAmount"] ?? 0;
                     // int takenAmount = customer["takenAmount"] ?? 0;
                     // int balance = givenAmount - takenAmount;
                     // String initials =name.isNotEmpty? name.trim().split(' ').map((word) => word[0]).take(2).join().toUpperCase(): "";
-
-                    return GestureDetector(
-                      // onTap: () {
-                      //   customerController.selectCustomer(index);
-                      //   Get.to(
-                      //     () => CustomerDetailPage(customer: customer),
-                      //   )?.then((_) {
-                      //     customerController.selectedCustomerIndex.refresh();
-                      //   });
-                      // },
-                      child: Card(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 5,
-                        ),
-                        shape: RoundedRectangleBorder(),
-                        // decoration: BoxDecoration(
-                        //   color: AppColors.white,
-                        //   borderRadius: BorderRadius.circular(15),
-                        //   border: Border.all(
-                        //     color:
-                        //         customerController
-                        //                     .selectedCustomerIndex
-                        //                     .value ==
-                        //                 index
-                        //             ? AppColors.primaryColor
-                        //             : AppColors.lightGrey1,
-                        //   ),
-                        // ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          // child: Column(
-                          // mainAxisAlignment: MainAxisAlignment.start,
-                          // crossAxisAlignment: CrossAxisAlignment.start,
-                          // children: [
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // CircleAvatar(
-                              //   backgroundColor: AppColors.primaryColor,
-                              //   child: Text(
-                              //     initials,
-                              //     style: TextStyles().textStylePoppins(
-                              //       size: 14,
-                              //       color: AppColors.white,
-                              //       fontWeight: FontWeight.w500,
-                              //     ),
-                              //   ),
-                              // ),
-                              // SizedBox(width: 10),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: true,
-                                    style: TextStyles().textStylePoppins(
-                                      size: 16,
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Contact No: $phone",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: true,
-                                    style: TextStyles().textStylePoppins(
-                                      size: 14,
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ).tr(),
-                                  // Text(
-                                  //   "Pending Balance: ₹$balance",
-                                  //   style: TextStyles().textStylePoppins(
-                                  //     size: 14,
-                                  //     fontWeight: FontWeight.bold,
-                                  //     color:
-                                  //         balance < 0
-                                  //             ? Colors.red
-                                  //             : Colors.green,
-                                  //   ),
-                                  // ).tr(),
-                                ],
-                              ),
-                              Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: GestureDetector(
-                                  onTap: () => openWhatsApp(customer),
-                                  child: Image.asset(
-                                    AssetsPath.whatsapp,
-                                    height: 25,
-                                    width: 25,
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                child: Icon(
-                                  Icons.delete,
-                                  color: AppColors.primaryColor,
-                                ),
-                                onTap: () => showDeleteDialog(index),
-                              ),
-                            ],
-                          ),
-                          // SizedBox(height: 10),
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.start,
-                          //   crossAxisAlignment: CrossAxisAlignment.center,
-                          //   children: [
-                          //     SizedBox(
-                          //       height: 40,
-                          //       width: 100,
-                          //       child: CommonElevatedButton(
-                          //         onPressed:
-                          //             () => Get.to(
-                          //               () => UpdateBalancePage(
-                          //                 customer: customer,
-                          //                 isGiven: true,
-                          //               ),
-                          //             ),
-                          //         text: 'given'.tr(),
-                          //         backgroundColor: AppColors.primaryColor,
-                          //         progressColor: AppColors.white,
-                          //         disabledBackgroundColor: AppColors.grey,
-                          //       ),
-                          //     ),
-                          //     SizedBox(width: 10),
-                          //     SizedBox(
-                          //       height: 40,
-                          //       width: 100,
-                          //       child: CommonElevatedButton(
-                          //         onPressed:
-                          //             () => Get.to(
-                          //               () => UpdateBalancePage(
-                          //                 customer: customer,
-                          //                 isGiven: false,
-                          //               ),
-                          //             ),
-                          //         text: 'taken'.tr(),
-                          //         backgroundColor: AppColors.primaryColor,
-                          //         progressColor: AppColors.white,
-                          //         disabledBackgroundColor: AppColors.grey,
-                          //       ),
-                          //     ),
-                          //     SizedBox(width: 70),
-                          //     GestureDetector(
-                          //       child: Icon(
-                          //         Icons.delete,
-                          //         color: AppColors.primaryColor,
-                          //       ),
-                          //       onTap: () => showDeleteDialog(index),
-                          //     ),
-                          //   ],
-                          // ),
-                          //   ],
-                          // ),
-                        ),
-                      ),
-                      // ),
+                    return ListTile(
+                      title: Text(customer.name),
+                      subtitle: Text("Phone: ${customer.phone}"),
                     );
+                    // return GestureDetector(
+                    //   // onTap: () {
+                    //   //   customerController.selectCustomer(index);
+                    //   //   Get.to(
+                    //   //     () => CustomerDetailPage(customer: customer),
+                    //   //   )?.then((_) {
+                    //   //     customerController.selectedCustomerIndex.refresh();
+                    //   //   });
+                    //   // },
+                    //   child: Card(
+                    //     margin: EdgeInsets.symmetric(
+                    //       horizontal: 15,
+                    //       vertical: 5,
+                    //     ),
+                    //     shape: RoundedRectangleBorder(),
+                    //     // decoration: BoxDecoration(
+                    //     //   color: AppColors.white,
+                    //     //   borderRadius: BorderRadius.circular(15),
+                    //     //   border: Border.all(
+                    //     //     color:
+                    //     //         customerController
+                    //     //                     .selectedCustomerIndex
+                    //     //                     .value ==
+                    //     //                 index
+                    //     //             ? AppColors.primaryColor
+                    //     //             : AppColors.lightGrey1,
+                    //     //   ),
+                    //     // ),
+                    //     child: Padding(
+                    //       padding: const EdgeInsets.symmetric(
+                    //         horizontal: 12,
+                    //         vertical: 10,
+                    //       ),
+                    //
+                    //       child: Row(
+                    //         mainAxisAlignment: MainAxisAlignment.start,
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           // CircleAvatar(
+                    //           //   backgroundColor: AppColors.primaryColor,
+                    //           //   child: Text(
+                    //           //     initials,
+                    //           //     style: TextStyles().textStylePoppins(
+                    //           //       size: 14,
+                    //           //       color: AppColors.white,
+                    //           //       fontWeight: FontWeight.w500,
+                    //           //     ),
+                    //           //   ),
+                    //           // ),
+                    //           // SizedBox(width: 10),
+                    //           Column(
+                    //             mainAxisAlignment: MainAxisAlignment.start,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Text(
+                    //                 name,
+                    //                 maxLines: 1,
+                    //                 overflow: TextOverflow.ellipsis,
+                    //                 softWrap: true,
+                    //                 style: TextStyles().textStylePoppins(
+                    //                   size: 16,
+                    //                   color: AppColors.black,
+                    //                   fontWeight: FontWeight.bold,
+                    //                 ),
+                    //               ),
+                    //               Text(
+                    //                 "Contact No: $phone",
+                    //                 maxLines: 1,
+                    //                 overflow: TextOverflow.ellipsis,
+                    //                 softWrap: true,
+                    //                 style: TextStyles().textStylePoppins(
+                    //                   size: 14,
+                    //                   color: AppColors.black,
+                    //                   fontWeight: FontWeight.w500,
+                    //                 ),
+                    //               ).tr(),
+                    //               // Text(
+                    //               //   "Pending Balance: ₹$balance",
+                    //               //   style: TextStyles().textStylePoppins(
+                    //               //     size: 14,
+                    //               //     fontWeight: FontWeight.bold,
+                    //               //     color:
+                    //               //         balance < 0
+                    //               //             ? Colors.red
+                    //               //             : Colors.green,
+                    //               //   ),
+                    //               // ).tr(),
+                    //             ],
+                    //           ),
+                    //           Spacer(),
+                    //           Padding(
+                    //             padding: const EdgeInsets.only(right: 10),
+                    //             child: GestureDetector(
+                    //               onTap: () => openWhatsApp(customer),
+                    //               child: Image.asset(
+                    //                 AssetsPath.whatsapp,
+                    //                 height: 25,
+                    //                 width: 25,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //           GestureDetector(
+                    //             child: Icon(
+                    //               Icons.delete,
+                    //               color: AppColors.primaryColor,
+                    //             ),
+                    //             onTap: () => showDeleteDialog(index),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   // ),
+                    // );
                   },
                 ),
       ),

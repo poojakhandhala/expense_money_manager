@@ -2,14 +2,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:expense_money_manager/utils/assets_path.dart';
+import 'package:expense_money_manager/utils/formated_date.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomerDetailPage extends StatefulWidget {
   final Map<String, dynamic> customer;
+  final bool isDiscountPage;
 
-  CustomerDetailPage({required this.customer});
+  CustomerDetailPage({required this.customer, this.isDiscountPage = false});
 
   @override
   State<CustomerDetailPage> createState() => _CustomerDetailPageState();
@@ -112,10 +114,176 @@ class _CustomerDetailPageState extends State<CustomerDetailPage> {
               //   ],
               // ),
               SizedBox(height: 20),
-              _buildTopCard(),
+              _buildTopCard1(widget.customer),
               _buildHistoryList(),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopCard1(
+    Map<String, dynamic> customer, {
+    bool isDiscountPage = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.grey.withOpacity(0.2),
+            spreadRadius: 3,
+            blurRadius: 7,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.isDiscountPage ? "મૂડી" : "total_in",
+                        style: TextStyles().textStylePoppins(
+                          size: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ).tr(),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "₹${(widget.isDiscountPage ? (customer["principalAmount"] ?? 0) : (customer["takenAmount"] ?? 0)).toStringAsFixed(2)}",
+                            style: TextStyles().textStylePoppins(
+                              size: 16,
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8), // Spacing between cards
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.isDiscountPage ? "વ્યાજ" : "total_out",
+                        style: TextStyles().textStylePoppins(
+                          size: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ).tr(),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "₹${(widget.isDiscountPage ? (customer["interestAmount"] ?? 0) : (customer["givenAmount"] ?? 0)).toStringAsFixed(2)}",
+                            style: TextStyles().textStylePoppins(
+                              size: 16,
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.isDiscountPage ? "ટકાવારી" : "pending_balance",
+                  style: TextStyles().textStylePoppins(
+                    size: 12,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ).tr(),
+                Text(
+                  widget.isDiscountPage
+                      ? "${customer["interestPercentage"] ?? 0}%"
+                      : "₹${((customer["takenAmount"] ?? 0) - (customer["givenAmount"] ?? 0)).toStringAsFixed(2)}",
+                  style: TextStyles().textStylePoppins(
+                    size: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (widget.isDiscountPage)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "વ્યાજ તારીખ",
+                    style: TextStyles().textStylePoppins(
+                      size: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ).tr(),
+                  Text(
+                    formatVyajDate(customer["vyajDate"] ?? ""),
+                    style: TextStyles().textStylePoppins(
+                      size: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

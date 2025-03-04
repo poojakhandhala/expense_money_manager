@@ -25,7 +25,8 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _vyajDateController = TextEditingController();
-  final TextEditingController _discountController = TextEditingController();
+  final TextEditingController _percentageController = TextEditingController();
+  final TextEditingController _installmentController = TextEditingController();
 
   String? _selectedCustomerName;
   String _transactionType = "Given";
@@ -36,11 +37,7 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
   // );
 
   final BorrowController2 borrowController2 = Get.find();
-  final DiscountController discountController = Get.put(
-    DiscountController(),
-    permanent: true,
-  );
-
+  final DiscountController discountController = Get.find();
   final CustomerController customerController = Get.put(
     CustomerController(),
     permanent: true,
@@ -77,11 +74,98 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
     });
   }
 
+  void _submitForm2() async {
+    if (_selectedCustomerName == null ||
+        _selectedCustomerName!.trim().isEmpty ||
+        _amountController.text.trim().isEmpty ||
+        _dateController.text.trim().isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please fill in all required fields!",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    int? amount = int.tryParse(_amountController.text.replaceAll(",", ""));
+    int? discountPercentage = int.tryParse(_percentageController.text) ?? 0;
+
+    if (amount == null || amount <= 0) {
+      Get.snackbar(
+        "Invalid Input",
+        "Enter a valid amount",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    // Calculate Discount
+    double discountAmount = (amount * discountPercentage) / 100;
+    int finalBalance = amount - discountAmount.toInt();
+
+    // Calculate installment amount directly when isDiscount is true
+    int installmentAmount =
+        widget.isDiscount
+            ? (finalBalance ~/ 12)
+            : 0; // Example: Dividing into 12 months
+
+    Get.dialog(
+      Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
+    await Future.delayed(Duration(seconds: 1));
+
+    String transactionType = _transactionType;
+    String vyajDate = _vyajDateController.text;
+
+    if (widget.isDiscount) {
+      Get.find<DiscountController>().addDiscountCustomer(
+        _selectedCustomerName!.trim(),
+        givenAmount: transactionType == "Given" ? finalBalance : 0,
+        takenAmount: transactionType == "Taken" ? finalBalance : 0,
+        vyajDate: vyajDate,
+        discountPercentage: discountPercentage,
+        installmentAmount: installmentAmount, // Direct calculation
+      );
+    } else {
+      borrowController2.addborrowCustomer(
+        _selectedCustomerName!.trim(),
+        givenAmount: transactionType == "Given" ? finalBalance : 0,
+        takenAmount: transactionType == "Taken" ? finalBalance : 0,
+      );
+    }
+
+    Get.back();
+    Get.snackbar(
+      "Success",
+      "Transaction added successfully!",
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+
+    _descriptionController.clear();
+    _amountController.clear();
+    _percentageController.clear();
+    _installmentController.clear();
+    _transactionType = "Given";
+    _amountHint = "Enter Given Amount";
+    _selectedCustomerName = null;
+    _nameController.clear();
+
+    borrowController2.update();
+    discountController.update();
+    setState(() {});
+    Get.back();
+  }
+
   void _submitForm() async {
     if (_selectedCustomerName == null ||
         _selectedCustomerName!.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty ||
         _amountController.text.trim().isEmpty ||
+        // _percentageController.text.trim().isEmpty ||
         _dateController.text.trim().isEmpty) {
       Get.snackbar(
         "Error",
@@ -112,42 +196,16 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
 
     String transactionType = _transactionType ?? "Given";
 
-    // int index = borrowController2.borrow.indexWhere(
-    //   (customer) => customer["name"] == _selectedCustomerName,
-    // );
-    //
-    // if (index != -1) {
-    //   borrowController2.updateborrowBalance(
-    //     _selectedCustomerName!,
-    //     _transactionType == "Given",
-    //     amount,
-    //     _descriptionController.text.trim(),
-    //   );
-    // } else {
-    //   // Add new customer
-    //   borrowController2.addborrowCustomer(
-    //     _selectedCustomerName!.trim(),
-    //     givenAmount: _transactionType == "Given" ? amount : 0,
-    //     takenAmount: _transactionType == "Given" ? 0 : amount,
-    //   );
-    // }
-
-    // Get.back();
+    int? discountPercentage = int.tryParse(_percentageController.text) ?? 0;
+    String vyajDate = _vyajDateController.text;
     if (widget.isDiscount) {
-      // Handle Discount Transactions
-      int? discountPercentage =
-          int.tryParse(_discountController.text.trim()) ?? 0;
-      discountController.addDiscountCustomer(
+      Get.find<DiscountController>().addDiscountCustomer(
         _selectedCustomerName!.trim(),
-        givenAmount: transactionType == "Given" ? amount : 0,
-        takenAmount: transactionType == "Taken" ? amount : 0,
-        date: _dateController.text.trim(),
-        description: _descriptionController.text.trim(),
-        vyajDate: _vyajDateController.text.trim(),
+        givenAmount: amount ?? 0,
+        vyajDate: vyajDate,
         discountPercentage: discountPercentage,
       );
     } else {
-      // Handle Borrow Transactions
       borrowController2.addborrowCustomer(
         _selectedCustomerName!.trim(),
         givenAmount: transactionType == "Given" ? amount : 0,
@@ -178,7 +236,7 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
 
     _descriptionController.clear();
     _amountController.clear();
-    _discountController.clear();
+    _percentageController.clear();
     _transactionType = "Given";
     _amountHint = "Enter Given Amount";
     _selectedCustomerName = null;
@@ -305,7 +363,7 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
                   children: [
                     CommonEditTextField(
                       hintText: "enter_discount_percentage".tr(),
-                      textEditingController: _discountController,
+                      textEditingController: _percentageController,
                       textInputType: TextInputType.number,
                     ),
                     SizedBox(height: 10),
@@ -327,7 +385,7 @@ class _BorrowAddFormState extends State<BorrowAddForm> {
                 ),
               SizedBox(height: 20),
               CommonElevatedButton(
-                onPressed: _submitForm,
+                onPressed: _submitForm2,
                 text: 'submit'.tr(),
                 progressColor: AppColors.white,
                 backgroundColor: AppColors.primaryColor,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'servies/api_servies.dart';
 import 'ui/add_customer/customer_controller.dart';
 import 'ui/discount/discount_controller.dart';
 
@@ -14,6 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await GetStorage.init();
+  Get.put(ApiService());
   Get.put(CustomerController());
   Get.put(BorrowController2());
   Get.put(DiscountController());

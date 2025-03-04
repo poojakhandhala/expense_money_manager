@@ -26,6 +26,7 @@ class BorrowController2 extends GetxController {
       "balance": balance,
     });
     saveborrowCustomers();
+    update();
   }
 
   void deleteborrowCustomer(int index) {
@@ -34,6 +35,7 @@ class BorrowController2 extends GetxController {
     if (selectedborrowIndex.value == index) {
       selectedborrowIndex.value = -1;
     }
+    update();
   }
 
   void selectborrowCustomer(int index) {
@@ -74,7 +76,9 @@ class BorrowController2 extends GetxController {
   ) {
     int index = borrow.indexWhere((customer) => customer["name"] == name);
     if (index != -1) {
-      var customer = borrow[index];
+      // var customer = borrow[index];
+      var customer = Map<String, dynamic>.from(borrow[index]);
+
       if (isGiven) {
         customer["givenAmount"] += amount;
       } else {

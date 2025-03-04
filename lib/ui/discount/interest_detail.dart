@@ -2,11 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/add_customer/balance_page.dart';
+import 'package:expense_money_manager/ui/add_customer/customer_controller.dart';
+import 'package:expense_money_manager/ui/add_customer/customer_detail.dart';
 import 'package:expense_money_manager/ui/borrow/borrow_addform.dart';
 import 'package:expense_money_manager/ui/discount/discount_controller.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:expense_money_manager/utils/assets_path.dart';
+import 'package:expense_money_manager/utils/formated_date.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
@@ -16,6 +19,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class InterestDetailPage extends StatelessWidget {
   final DiscountController discountController = Get.put(DiscountController());
+  final CustomerController customerController = Get.put(
+    CustomerController(),
+    permanent: true,
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,94 +45,119 @@ class InterestDetailPage extends StatelessWidget {
                   itemCount: discountController.discount.length,
                   itemBuilder: (context, index) {
                     var transaction = discountController.discount[index];
-                    return Card(
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                      shape: RoundedRectangleBorder(),
-                      elevation: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                    return GestureDetector(
+                      onTap: () {
+                        discountController.selectDiscountCustomer(index);
+                        var selectedCustomer =
+                            discountController.discount[index];
+                        Get.to(
+                          () => CustomerDetailPage(
+                            customer: selectedCustomer,
+                            isDiscountPage: true,
+                          ),
+                        )?.then((_) {
+                          customerController.selectedCustomerIndex.refresh();
+                        });
+                      },
+                      child: Card(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 5,
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      transaction["name"] ?? "Unknown",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      softWrap: true,
-                                      style: TextStyles().textStylePoppins(
-                                        size: 16,
-                                        color: AppColors.black,
-                                        fontWeight: FontWeight.bold,
+                        shape: RoundedRectangleBorder(),
+                        elevation: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        transaction["name"] ?? "Unknown",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                        style: TextStyles().textStylePoppins(
+                                          size: 16,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      "Pending Balance:${transaction["balance"]}",
-                                      style: TextStyles().textStylePoppins(
-                                        size: 14,
-                                        fontWeight: FontWeight.w500,
-                                        // color: balance < 0 ? Colors.red : Colors.green,
+                                      Text(
+                                        "Amount: ${transaction["balance"].abs()}",
+                                        style: TextStyles().textStylePoppins(
+                                          size: 14,
+                                          fontWeight: FontWeight.w500,
+                                          // color: balance < 0 ? Colors.red : Colors.green,
+                                        ),
+                                      ).tr(),
+                                      Text(
+                                        "Installment Amount: ${transaction["installmentAmount"] ?? 0}",
                                       ),
-                                    ).tr(),
-                                    Text(
-                                      "Discount: ${transaction["discount"] ?? '0'}%",
-                                    ),
-                                    Text(
-                                      "Interest Date: ${transaction["vyajDate"]}",
-                                    ),
-                                  ],
-                                ),
-                                Spacer(),
-                                GestureDetector(
-                                  onTap: () => openWhatsApp(transaction),
-                                  child: Image.asset(
-                                    AssetsPath.whatsapp,
-                                    height: 25,
-                                    width: 25,
+                                      Text(
+                                        "Discount: ${transaction["discount"] ?? '0'}%",
+                                      ),
+                                      Text(
+                                        "Interest Date: ${formatVyajDate(transaction["vyajDate"])}",
+                                      ),
+                                      // Text(
+                                      //   "Interest Date: ${transaction["vyajDate"]}",
+                                      // ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                _buildTransactionButton(
-                                  'Given',
-                                  true,
-                                  index,
-                                  transaction,
-                                ),
-                                const SizedBox(width: 10),
-                                _buildTransactionButton(
-                                  'Taken',
-                                  false,
-                                  index,
-                                  transaction,
-                                ),
-                                SizedBox(width: 70),
-                                GestureDetector(
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: AppColors.primaryColor,
+                                  Spacer(),
+                                  GestureDetector(
+                                    onTap: () => openWhatsApp(transaction),
+                                    child: Image.asset(
+                                      AssetsPath.whatsapp,
+                                      height: 25,
+                                      width: 25,
+                                    ),
                                   ),
-                                  onTap: () => showDeleteDialog(index),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  _buildTransactionButton(
+                                    'Given',
+                                    true,
+                                    index,
+                                    transaction,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  _buildTransactionButton(
+                                    'Taken',
+                                    false,
+                                    index,
+                                    transaction,
+                                  ),
+                                  SizedBox(width: 70),
+                                  GestureDetector(
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    onTap: () => showDeleteDialog(index),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -154,13 +186,16 @@ class InterestDetailPage extends StatelessWidget {
       child: CommonElevatedButton(
         onPressed: () async {
           Map<String, dynamic>? updatedTransaction = await Get.to(
-            () => UpdateBalancePage(
-              customer: transaction, // Pass the transaction object here
-              isGiven: isGiven,
-            ),
+            () => UpdateBalancePage(customer: transaction, isGiven: isGiven),
           );
           if (updatedTransaction != null) {
-            discountController.update(); // Force UI refresh
+            discountController.updateDiscountBalance(
+              transaction["name"],
+              isGiven,
+              updatedTransaction["amount"],
+              transaction["description"],
+              transaction["discount"],
+            );
           }
         },
         text: label.tr(),
@@ -181,7 +216,7 @@ class InterestDetailPage extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -319,4 +354,29 @@ class InterestDetailPage extends StatelessWidget {
 // return SizedBox.shrink();
 // },
 // ),
+// ),
+
+// Example: Given Button
+
+// ElevatedButton(
+// onPressed: () {
+// int amount = int.tryParse(_amountController.text.trim()) ?? 0;
+// if (amount > 0) {
+// borrowController2.updateborrowBalance(_selectedCustomerName!, true, amount);
+// discountController.updateDiscountBalance(_selectedCustomerName!, true, amount, 10);
+// }
+// },
+// child: Text("Given"),
+// ),
+//
+// // Example: Taken Button
+// ElevatedButton(
+// onPressed: () {
+// int amount = int.tryParse(_amountController.text.trim()) ?? 0;
+// if (amount > 0) {
+// borrowController2.updateborrowBalance(_selectedCustomerName!, false, amount);
+// discountController.updateDiscountBalance(_selectedCustomerName!, false, amount, 10);
+// }
+// },
+// child: Text("Taken"),
 // ),

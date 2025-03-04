@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:expense_money_manager/controller/login_controller.dart';
 import 'package:expense_money_manager/reusable_widgets/common_edit_text_field.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
 import 'package:expense_money_manager/ui/add_customer/customer_Info.dart';
@@ -201,6 +202,12 @@ class _HomePageState extends State<HomePage> {
                 fontWeight: FontWeight.bold,
               ),
             ).tr(),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.login_outlined, size: 24),
+            onPressed: () => showLogoutDialog(),
+          ),
+        ],
       ),
       body: _buildMain(),
     );
@@ -395,6 +402,67 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void showLogoutDialog() {
+    Get.dialog(
+      barrierDismissible: false,
+      Dialog(
+        backgroundColor: AppColors.transparent,
+        child: WillPopScope(
+          onWillPop: () async => false,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(AssetsPath.logout, height: 50, width: 50),
+                SizedBox(height: 20),
+                Text(
+                  "Logout_subtitle",
+                  textAlign: TextAlign.center,
+                  style: TextStyles().textStylePoppins(
+                    size: 14,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ).tr(),
+                SizedBox(height: 10),
+                CommonElevatedButton(
+                  text: "yes_logout".tr(),
+                  onPressed: () {
+                    LoginController().logout();
+                  },
+                  progressColor: AppColors.grey,
+                  backgroundColor: AppColors.primaryColor,
+                  disabledBackgroundColor: AppColors.grey,
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: Text(
+                    "No_logout".tr(),
+                    style: TextStyles().textStylePoppins(
+                      size: 16,
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

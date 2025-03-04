@@ -15,4 +15,5 @@ class AssetsPath {
   static String arrow_up = "assets/images/arrow_up.png";
   static String arrow_down = "assets/images/arrow_down.png";
   static String delete = "assets/images/delete.png";
+  static String logout = "assets/images/logout.png";
 }

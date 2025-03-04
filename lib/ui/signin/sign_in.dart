@@ -1,12 +1,11 @@
+import 'package:expense_money_manager/controller/login_controller.dart';
 import 'package:expense_money_manager/reusable_widgets/common_edit_text_field.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
-import 'package:expense_money_manager/ui/dashborad/homePage.dart';
+import 'package:expense_money_manager/servies/getx_storage.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/app_textstyles.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -16,21 +15,22 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final storage = GetStorage();
+  final GetXStorage storage = GetXStorage();
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      print("Email: ${_emailController.text}");
-      print("Password: ${_passwordController.text}");
-
-      storage.write('isLoggedIn', true);
-
-      // Navigate to HomePage
-      Get.off(() => HomePage());
-    }
-  }
+  final LoginController loginController = Get.put(LoginController());
+  // void _login() {
+  //   if (_formKey.currentState!.validate()) {
+  //     print("Email: ${_phoneController.text}");
+  //     print("Password: ${_passwordController.text}");
+  //
+  //     storage.write('isLoggedIn', true);
+  //
+  //     // Navigate to HomePage
+  //     Get.off(() => HomePage());
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class _SignInState extends State<SignIn> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             child: Form(
               key: _formKey,
               child: Column(
@@ -65,12 +65,14 @@ class _SignInState extends State<SignIn> {
                   CommonEditTextField(
                     validator:
                         (value) =>
-                            value!.isEmpty ? "Please enter your email" : null,
-                    hintText: 'Email',
-                    textEditingController: _emailController,
-                    textInputType: TextInputType.emailAddress,
+                            value!.isEmpty
+                                ? "Please enter your Phone number"
+                                : null,
+                    hintText: 'Phone',
+                    textEditingController: _phoneController,
+                    textInputType: TextInputType.number,
                     prefixIcon: Icon(
-                      Icons.email,
+                      Icons.phone,
                       size: 24,
                       color: AppColors.black,
                     ),
@@ -94,19 +96,33 @@ class _SignInState extends State<SignIn> {
                                 ? "Please enter your password"
                                 : null,
                   ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: CommonElevatedButton(
-                      onPressed: _login,
+                  SizedBox(height: 20),
+                  Obx(() {
+                    return SizedBox(
+                      width: double.infinity,
+                      child: CommonElevatedButton(
+                        onPressed:
+                            loginController.isLoading.value
+                                ? () {}
+                                : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    loginController.login(
+                                      _phoneController.text,
+                                      _passwordController.text,
+                                    );
+                                  }
+                                },
 
-                      text: 'Login',
-
-                      backgroundColor: AppColors.primaryColor,
-                      progressColor: AppColors.white,
-                      disabledBackgroundColor: AppColors.green200,
-                    ),
-                  ),
+                        text:
+                            loginController.isLoading.value
+                                ? 'Logging in...'
+                                : 'Login',
+                        backgroundColor: AppColors.primaryColor,
+                        progressColor: AppColors.white,
+                        disabledBackgroundColor: AppColors.green200,
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
