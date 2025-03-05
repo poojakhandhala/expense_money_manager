@@ -20,30 +20,20 @@ class ApiService extends GetConnect {
   }
 
   Future<Response> login(Map<String, dynamic> data) async {
-    return post(UrlEndPoints.login, data);
+    // return post("${UrlEndPoints.login}", data);
+    return post("${UrlEndPoints.baseUrl}${UrlEndPoints.login}", data);
   }
 
   Future<Response> getCustomers() async {
     return get("${UrlEndPoints.customer}", headers: headers);
   }
-  // Future<Response?> getCustomers() async {
-  //   try {
-  //     var response = await get(UrlEndPoints.customer, headers: headers);
-  //     return response;
-  //   } catch (e) {
-  //     print("API Call Failed: $e");
-  //     return null;
-  //   }
-  // }
 
   Future<Response> deleteCustomer(int id) async {
     return delete("${UrlEndPoints.customer}/$id", headers: headers);
   }
 
-  // Create a new customer
   Future<Response> createCustomer(Map<String, dynamic> data) async {
-    // updateHeaders();
-    return post(UrlEndPoints.customer, jsonEncode(data), headers: headers);
+    return post("${UrlEndPoints.customer}", jsonEncode(data), headers: headers);
   }
 
   // // Fetch customer list

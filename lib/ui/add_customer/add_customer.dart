@@ -26,6 +26,7 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
   );
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final CustomerApiController customerApiController = Get.find();
 
   void _saveCustomer() {
@@ -37,7 +38,21 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
       Get.snackbar("Error", "Enter a valid 10-digit phone number");
       return;
     }
-    //
+    if (_emailController.text.trim().isNotEmpty &&
+        !RegExp(
+          r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        ).hasMatch(_emailController.text.trim())) {
+      Get.snackbar("Error", "Enter a valid email address");
+      return;
+    }
+    Map<String, dynamic> customerData = {
+      "name": _nameController.text.trim(),
+      "mobile": _phoneController.text.trim(),
+      "email": _emailController.text.trim(), // Added email
+      "address": "123 Main Street",
+    };
+
+    customerApiController.addCustomer(customerData);
     // customerApiController.addCustomer(
     //   _nameController.text,
     //   _phoneController.text,
@@ -89,6 +104,21 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
               hintText: "phone".tr(),
               isPhoneField: true,
               maxLength: 10,
+            ),
+            SizedBox(height: 20),
+            Text(
+              "email",
+              style: TextStyles().textStylePoppins(
+                size: 14,
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ).tr(),
+            SizedBox(height: 10),
+            CommonEditTextField(
+              textEditingController: _emailController,
+              textInputType: TextInputType.emailAddress,
+              hintText: "email".tr(),
             ),
             SizedBox(height: 20),
             CommonElevatedButton(
