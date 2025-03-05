@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:expense_money_manager/controller/login_controller.dart';
 import 'package:expense_money_manager/routes/routes.dart';
 import 'package:expense_money_manager/servies/getx_storage.dart';
 import 'package:expense_money_manager/utils/app_color.dart';
 import 'package:expense_money_manager/utils/assets_path.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart' show Get;
-import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 
 class SplashPage extends StatefulWidget {
@@ -19,8 +17,6 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   final GetXStorage storage = GetXStorage();
-  final LoginController loginController = Get.put(LoginController());
-
   @override
   void initState() {
     super.initState();
@@ -33,18 +29,6 @@ class _SplashPageState extends State<SplashPage> {
       }
     });
   }
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   Future.delayed(const Duration(seconds: 2), () {
-  //     bool isLoggedIn = storage.read('isLoggedIn') ?? false;
-  //     if (isLoggedIn) {
-  //       Get.off(() => HomePage());
-  //     } else {
-  //       Get.off(() => SignIn());
-  //     }
-  //   });
-  // }
 
   @override
   void dispose() {

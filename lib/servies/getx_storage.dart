@@ -15,7 +15,6 @@ class GetXStorage {
   dynamic getData(String key) => GetStorage().read(key);
 
   void clearData() async => GetStorage().erase();
-
   String getToken() {
     if (getString(TOKEN) != null) {
       return getString(TOKEN) ?? "";
@@ -24,28 +23,9 @@ class GetXStorage {
   }
 
   bool isLogin() {
-    return getBool('isLoggedIn') ?? false;
+    if (getToken() != "") {
+      return true;
+    }
+    return false;
   }
-  // bool isLogin() {
-  //   if (getToken() != "") {
-  //     return true;
-  //   }
-  //   return false;
-  // }
-  //
-  // String getUserEmail() {
-  //   String value = "";
-  //   if (getString(EMAIL) != null) {
-  //     value = getString(EMAIL) ?? "";
-  //   }
-  //   return value;
-  // }
-
-  // String getMobileNumber() {
-  //   String value = "";
-  //   if (getString(MOBILENUMBER) != null) {
-  //     value = getString(MOBILENUMBER) ?? "";
-  //   }
-  //   return value;
-  // }
 }

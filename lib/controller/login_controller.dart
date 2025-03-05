@@ -3,6 +3,7 @@ import 'package:expense_money_manager/model/login_api_model.dart';
 import 'package:expense_money_manager/servies/api_servies.dart';
 import 'package:expense_money_manager/servies/getx_storage.dart';
 import 'package:expense_money_manager/ui/dashborad/homePage.dart';
+import 'package:expense_money_manager/utils/app_prefernce_key.dart';
 import 'package:get/get.dart';
 
 class LoginController extends BaseController {
@@ -16,6 +17,7 @@ class LoginController extends BaseController {
     isLoading.value = true;
 
     try {
+      print("Login Request: Mobile=$mobile, Password=$password");
       final response = await apiService.login({
         "mobile": mobile,
         "password": password,
@@ -24,11 +26,11 @@ class LoginController extends BaseController {
       if (response.statusCode == 200) {
         final loginResponse = LoginResponse.fromJson(response.body);
 
-        if (loginResponse.status == true) {
-          storage.setData('token', loginResponse.token);
-          storage.setData('user', loginResponse.user?.toJson());
-          storage.setData('isLoggedIn', true);
-
+        if (loginResponse.status == true && loginResponse.token != null) {
+          storage.setData(TOKEN, loginResponse.token);
+          storage.setData(USER, loginResponse.user?.toJson());
+          // storage.setData('isLoggedIn', true);
+          print("Stored Token: ${storage.getToken()}");
           Get.off(() => HomePage()); // Navigate to home
         } else {
           Get.snackbar("Error", loginResponse.message ?? "Login failed");

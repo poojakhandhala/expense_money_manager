@@ -9,27 +9,60 @@ class ApiService extends GetConnect {
 
   @override
   void onInit() {
-    // same api hoy to url use krvni
     httpClient.baseUrl = UrlEndPoints.baseUrl;
-
     httpClient.timeout = const Duration(seconds: 30);
     headers = {
-      "Authorization": GetXStorage().getToken() ?? "",
+      // "Authorization": GetXStorage().getToken() ?? "",
+      "Authorization": "Bearer ${GetXStorage().getToken() ?? ""}",
       "Content-Type": "application/json",
     };
-
     super.onInit();
   }
 
   Future<Response> login(Map<String, dynamic> data) async {
-    return post(UrlEndPoints.login, jsonEncode(data), headers: headers);
-  }
-
-  Future<Response> customers(Map<String, dynamic> data) async {
-    return post(UrlEndPoints.customer, jsonEncode(data), headers: headers);
+    return post(UrlEndPoints.login, data);
   }
 
   Future<Response> getCustomers() async {
-    return get(UrlEndPoints.customer);
+    return get("${UrlEndPoints.customer}", headers: headers);
   }
+  // Future<Response?> getCustomers() async {
+  //   try {
+  //     var response = await get(UrlEndPoints.customer, headers: headers);
+  //     return response;
+  //   } catch (e) {
+  //     print("API Call Failed: $e");
+  //     return null;
+  //   }
+  // }
+
+  Future<Response> deleteCustomer(int id) async {
+    return delete("${UrlEndPoints.customer}/$id", headers: headers);
+  }
+
+  // Create a new customer
+  Future<Response> createCustomer(Map<String, dynamic> data) async {
+    // updateHeaders();
+    return post(UrlEndPoints.customer, jsonEncode(data), headers: headers);
+  }
+
+  // // Fetch customer list
+  // Future<Response> getCustomers() async {
+  //   return get(UrlEndPoints.customer, headers: headers);
+  // }
+  //
+  // // Create a new customer
+  // Future<Response> createCustomer(Map<String, dynamic> data) async {
+  //   return post(UrlEndPoints.customer, data, headers: headers);
+  // }
+  //
+  // // Update customer
+  // Future<Response> updateCustomer(int id, Map<String, dynamic> data) async {
+  //   return put("${UrlEndPoints.customer}/$id", data, headers: headers);
+  // }
+  //
+  // // Delete customer
+  // Future<Response> deleteCustomer(int id) async {
+  //   return delete("${UrlEndPoints.customer}/$id", headers: headers);
+  // }
 }

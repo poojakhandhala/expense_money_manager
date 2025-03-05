@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:expense_money_manager/controller/customer_api_controller.dart';
 import 'package:expense_money_manager/reusable_widgets/common_app_bar.dart';
 import 'package:expense_money_manager/reusable_widgets/common_edit_text_field.dart';
 import 'package:expense_money_manager/reusable_widgets/common_elevated_button.dart';
@@ -25,6 +26,28 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
   );
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final CustomerApiController customerApiController = Get.find();
+
+  void _saveCustomer() {
+    if (_nameController.text.trim().isEmpty) {
+      Get.snackbar("Error", "Name is required");
+      return;
+    }
+    if (_phoneController.text.trim().length != 10) {
+      Get.snackbar("Error", "Enter a valid 10-digit phone number");
+      return;
+    }
+    //
+    // customerApiController.addCustomer(
+    //   _nameController.text,
+    //   _phoneController.text,
+    // );
+
+    _nameController.clear();
+    _phoneController.clear();
+    Get.back();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,42 +92,58 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
             ),
             SizedBox(height: 20),
             CommonElevatedButton(
-              onPressed: () {
-                if (_nameController.text.trim().isEmpty) {
-                  Get.snackbar(
-                    "error".tr(),
-                    "name_required".tr(),
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                  );
-                  return;
-                }
-                if (_phoneController.text.trim().length != 10 ||
-                    !RegExp(
-                      r'^[0-9]+$',
-                    ).hasMatch(_phoneController.text.trim())) {
-                  Get.snackbar(
-                    "error".tr(),
-                    "10_digit_phone".tr(),
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                  );
-                  return;
-                }
-
-                customerController.addCustomer(
-                  _nameController.text,
-                  _phoneController.text,
-                  givenAmount: 0,
-                  takenAmount: 0,
-                );
-
-                // Clear inputs
-                _nameController.clear();
-                _phoneController.clear();
-
-                Get.back();
-              },
+              // onPressed: () {
+              //   if (_nameController.text.trim().isEmpty) {
+              //     Get.snackbar(
+              //       "error".tr(),
+              //       "name_required".tr(),
+              //       backgroundColor: Colors.red,
+              //       colorText: Colors.white,
+              //     );
+              //     return;
+              //   }
+              //   if (_phoneController.text.trim().length != 10 ||
+              //       !RegExp(
+              //         r'^[0-9]+$',
+              //       ).hasMatch(_phoneController.text.trim())) {
+              //     Get.snackbar(
+              //       "error".tr(),
+              //       "10_digit_phone".tr(),
+              //       backgroundColor: Colors.red,
+              //       colorText: Colors.white,
+              //     );
+              //     return;
+              //   }
+              //
+              //   customerController.addCustomer(
+              //     _nameController.text,
+              //     _phoneController.text,
+              //     givenAmount: 0,
+              //     takenAmount: 0,
+              //   );
+              //
+              //   // Clear inputs
+              //   _nameController.clear();
+              //   _phoneController.clear();
+              //
+              //   Get.back();
+              // },
+              onPressed: _saveCustomer,
+              // onPressed: () {
+              //   if (_nameController.text.trim().isEmpty ||
+              //       _phoneController.text.trim().isEmpty) {
+              //     Get.snackbar("Error", "Name and phone are required!");
+              //     return;
+              //   }
+              //
+              //   customerApiController.addCustomer(
+              //     _nameController.text.trim(),
+              //     _phoneController.text.trim(),
+              //   );
+              //
+              //   _nameController.clear();
+              //   _phoneController.clear();
+              // },
               text: 'save'.tr(),
               progressColor: AppColors.white,
               backgroundColor: AppColors.primaryColor,
